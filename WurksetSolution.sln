@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32414.318
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WurksetTests", "WurksetTests\WurksetTests.csproj", "{CD375AE3-79EC-4284-BFC7-EF4BD7DEECAD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wurkset", "Wurkset\Wurkset.csproj", "{4A4AB457-EE37-4225-9321-A569D02A6F44}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CD375AE3-79EC-4284-BFC7-EF4BD7DEECAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD375AE3-79EC-4284-BFC7-EF4BD7DEECAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD375AE3-79EC-4284-BFC7-EF4BD7DEECAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD375AE3-79EC-4284-BFC7-EF4BD7DEECAD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A4AB457-EE37-4225-9321-A569D02A6F44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A4AB457-EE37-4225-9321-A569D02A6F44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A4AB457-EE37-4225-9321-A569D02A6F44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A4AB457-EE37-4225-9321-A569D02A6F44}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {863FEE87-9EA3-46E6-B14A-B30DCBA64C59}
+	EndGlobalSection
+EndGlobal
