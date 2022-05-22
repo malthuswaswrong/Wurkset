@@ -10,7 +10,6 @@ public class WorksetRepository
     {
         get
         {
-            //TODO Implement a better search.  Should scale to large numbers of worksets.
             long result = lastWorksetId;
             while (Directory.Exists(Path.Combine(options.BasePath, result.ToPath())))
             {
@@ -92,21 +91,36 @@ public class WorksetRepository
         T? data = JsonSerializer.Deserialize<T>(File.ReadAllText(datafile));
         return new Workset<T?>(id, path, data);
     }
-    public IEnumerable<Workset<T?>> GetAll<T>()
+    public IEnumerable<Workset<T?>> GetAll<T>(bool includeArchived)
     {
-        string[] paths = Directory.GetDirectories(options.BasePath);
         long id = 1;
         while (Directory.Exists(Path.Combine(options.BasePath, id.ToPath())))
         {
             string path = pathBulder(id);
             string datafile = Path.Combine(path, "data.json");
+            
             if (!File.Exists(datafile))
             {
-                throw new FileNotFoundException($"Workset {id} not found");
+                if(includeArchived)
+                {
+                    datafile = Path.Combine(path, "data.archived.json");
+                    if (!File.Exists(datafile))
+                    {
+                        continue;
+                    }
+                }
+                else
+                {
+                    continue;
+                }
             }
             T? data = JsonSerializer.Deserialize<T>(File.ReadAllText(datafile));
             yield return new Workset<T?>(id, path, data);
             id++;
         }
+    }
+    public IEnumerable<Workset<T?>> GetAll<T>()
+    {
+        return GetAll<T>(false);
     }
 }

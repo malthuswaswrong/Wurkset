@@ -59,7 +59,7 @@ public class Workset<T>
     public void Archive()
     {
         string datafile = Path.Combine(WorksetPath, "data.json");
-        string archivefile = Path.Combine(WorksetPath, "data.archived");
+        string archivefile = Path.Combine(WorksetPath, "data.archived.json");
         if (File.Exists(datafile)) File.Move(datafile, archivefile);
     }
     
