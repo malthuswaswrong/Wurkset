@@ -34,10 +34,10 @@ public class WorksetRepository
             //Reserve directory "0" for internal use.
             Directory.CreateDirectory(Path.Combine(this.options.BasePath, "0"));
         }
-        lastWorksetId = GetStartingGuess();
+        lastWorksetId = QueryLastUsedId();
     }
 
-    private long GetStartingGuess()
+    private long QueryLastUsedId()
     {
         long maxSearch = 1;
         if(!Directory.Exists(Path.Combine(options.BasePath, maxSearch.ToPath())))
@@ -50,11 +50,11 @@ public class WorksetRepository
             maxSearch *= 2;
         }
         long minSearch = maxSearch / 2;
-        long result = ReduceSearchSpace(minSearch, maxSearch);
+        long result = BinarySearch(minSearch, maxSearch);
         return result;
     }
 
-    private long ReduceSearchSpace(long min, long max)
+    private long BinarySearch(long min, long max)
     {
         if (max - min <= 1)
         {
@@ -63,11 +63,11 @@ public class WorksetRepository
         long mid = (min + max) / 2;
         if (Directory.Exists(Path.Combine(options.BasePath, mid.ToPath())))
         {
-            return ReduceSearchSpace(mid, max);
+            return BinarySearch(mid, max);
         }
         else
         {
-            return ReduceSearchSpace(min, mid);
+            return BinarySearch(min, mid);
         }
     }
 
