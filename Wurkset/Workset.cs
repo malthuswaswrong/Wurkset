@@ -4,9 +4,11 @@ namespace Wurkset;
 
 public class Workset<T>
 {
-    public long WorksetId { get; set; }
-    public string WorksetPath { get; set; }
+    public long WorksetId { get; }
+    public string WorksetPath { get; }
     public T? Value { get; set; }
+    public DateTime CreateTime => new FileInfo(Path.Combine(WorksetPath, "data.json")).CreationTime;
+    public DateTime LastModifiedTime => new FileInfo(Path.Combine(WorksetPath, "data.json")).LastWriteTime;
     public List<DateTime> PriorVersionDates
     {
         get
@@ -46,9 +48,10 @@ public class Workset<T>
         if (File.Exists(datafile)) File.Move(datafile, backupfile);
         File.WriteAllText(datafile, JsonSerializer.Serialize(Value));
     }
-    public Workset<T> GetPriorVersionAsOfDate(DateTime utcDateTime)
+    public Workset<T> GetPriorVersionAsOfDate(DateTime dateTime)
     {
-        DateTime? closestDate = PriorVersionDates.Where(x => x >= utcDateTime)?.Min();
+        //TODO Test this
+        DateTime? closestDate = PriorVersionDates.Where(x => x >= dateTime)?.Min();
         
         if(closestDate is null) return this;
         
@@ -61,25 +64,5 @@ public class Workset<T>
         string datafile = Path.Combine(WorksetPath, "data.json");
         string archivefile = Path.Combine(WorksetPath, "data.archived.json");
         if (File.Exists(datafile)) File.Move(datafile, archivefile);
-    }
-    
-    //TODO Add comment to stress that all subdirectories will be deleted.
-    public void Archive(bool permanentlyDeleteData)
-    {
-        if (permanentlyDeleteData)
-        {
-            foreach (var file in Directory.GetFiles(WorksetPath))
-            {
-                File.Delete(file);
-            }
-            foreach (var dir in Directory.GetDirectories(WorksetPath))
-            {
-                Directory.Delete(dir, true);
-            }
-        }
-        else
-        {
-            Archive();
-        }
     }
 }
