@@ -25,6 +25,11 @@ public class WorksetRepository
     public WorksetRepository(IOptions<WorksetRepositoryOptions> ioptions)
     {
         this.options = ioptions.Value;
+        if(String.Compare(this.options.BasePath, @"c:\", true ) == 0)
+        {
+            //I'm not taking on the responsibility of this library bricking someone's C drive
+            throw new Exception(@"You're not allowed to use C:\ as the base path.");
+        }
         if (!Directory.Exists(this.options.BasePath))
         {
             Directory.CreateDirectory(this.options.BasePath);
@@ -36,15 +41,14 @@ public class WorksetRepository
         }
         lastWorksetId = QueryLastUsedId();
     }
-
     private long QueryLastUsedId()
     {
-        long maxSearch = 1;
-        if(!Directory.Exists(Path.Combine(options.BasePath, maxSearch.ToPath())))
+        if (!Directory.Exists(Path.Combine(options.BasePath, "1")))
         {
             return 1;
         }
         
+        long maxSearch = 2;        
         while (Directory.Exists(Path.Combine(options.BasePath, maxSearch.ToPath())))
         {
             maxSearch *= 2;

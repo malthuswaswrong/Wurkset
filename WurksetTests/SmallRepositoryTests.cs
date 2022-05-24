@@ -144,7 +144,7 @@ public class SmallRepositoryTests
         WorksetRepository cut = new(ioptions);
         Assert.Equal(1, cut.NextWorksetId);
         Assert.True(Directory.Exists(options.BasePath));
-        Workset<TestData?> t1 = cut.Create(new TestData() { Id = 1, Data = "1" });
+        Workset<TestData> t1 = cut.Create(new TestData() { Id = 1, Data = "1" });
         Assert.NotNull(t1);
         Assert.Equal(1, t1.WorksetId);
         Assert.NotNull(t1.Value);
