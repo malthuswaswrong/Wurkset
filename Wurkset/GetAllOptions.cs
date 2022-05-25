@@ -2,6 +2,6 @@
 
 public class GetAllOptions
 {
-    public long? StartingId { get; set; }
+    public long? StartId { get; set; }
     public bool? IncludeArchived { get; set; }
 }

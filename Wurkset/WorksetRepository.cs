@@ -97,30 +97,29 @@ public class WorksetRepository
     }
     public IEnumerable<Workset<T?>> GetAll<T>(GetAllOptions? getOptions = null)
     {
-        long id = getOptions != null && getOptions.StartingId.HasValue ? getOptions.StartingId.Value : 1;
-        while (Directory.Exists(Path.Combine(options.BasePath, id.ToPath())))
+        long id = getOptions != null && getOptions.StartId.HasValue ? getOptions.StartId.Value : 1;
+        for (; id < NextWorksetId; id++)
         {
             string path = pathBulder(id);
             string datafile = Path.Combine(path, "data.json");
-            
-            if (!File.Exists(datafile))
+
+            if (File.Exists(datafile))
+            {
+                T? data = JsonSerializer.Deserialize<T>(File.ReadAllText(datafile));
+                yield return new Workset<T?>(id, path, data);
+            }
+            else
             {
                 if (getOptions != null && getOptions.IncludeArchived.HasValue && getOptions.IncludeArchived.Value)
                 {
                     datafile = Path.Combine(path, "data.archived.json");
-                    if (!File.Exists(datafile))
+                    if (File.Exists(datafile))
                     {
-                        continue;
+                        T? data = JsonSerializer.Deserialize<T>(File.ReadAllText(datafile));
+                        yield return new Workset<T?>(id, path, data);
                     }
                 }
-                else
-                {
-                    continue;
-                }
             }
-            T? data = JsonSerializer.Deserialize<T>(File.ReadAllText(datafile));
-            yield return new Workset<T?>(id, path, data);
-            id++;
         }
     }
 }

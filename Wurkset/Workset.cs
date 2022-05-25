@@ -6,9 +6,11 @@ public class Workset<T>
 {
     public long WorksetId { get; }
     public string WorksetPath { get; }
+    public string WorksetDataFile => (!Archived) ? Path.Combine(WorksetPath, "data.json") : Path.Combine(WorksetPath, "data.archived.json");
     public T? Value { get; set; }
-    public DateTime CreateTime => new FileInfo(Path.Combine(WorksetPath, "data.json")).CreationTime;
-    public DateTime LastModifiedTime => new FileInfo(Path.Combine(WorksetPath, "data.json")).LastWriteTime;
+    public bool Archived => (File.Exists(Path.Combine(WorksetPath, "data.archived.json")));
+    public DateTime CreationTime => new DirectoryInfo(WorksetPath).CreationTime;
+    public DateTime LastWriteTime => new FileInfo(WorksetDataFile).LastWriteTime;
     public List<DateTime> PriorVersionDates
     {
         get
@@ -17,8 +19,15 @@ public class Workset<T>
             foreach (var backupFile in Directory.GetFiles(WorksetPath, "data.*.json"))
             {
                 string fname = Path.GetFileName(backupFile);
-                string timestampstring = fname.Split('.')[1];
-                result.Add(new DateTime(long.Parse(timestampstring)));
+                if (long.TryParse(fname.Split('.')[1], out long timestamp))
+                {
+                    try
+                    {
+                        DateTime t = new DateTime(timestamp);
+                        result.Add(t);
+                    }
+                    catch (Exception) { }
+                }
             }
             return result;
         }
@@ -29,32 +38,23 @@ public class Workset<T>
         WorksetPath = worksetPath;
         Value = value;
     }
-    public void Save()
+    public void Save(bool keepVersionedCopy = false)
     {
-        string datafile = Path.Combine(WorksetPath, "data.json");
-        if (File.Exists(datafile)) File.Delete(datafile);
-        File.WriteAllText(datafile, JsonSerializer.Serialize(Value));
-    }
-    public void Save(bool keepVersionedCopy)
-    {
-        if (!keepVersionedCopy)
+        if (keepVersionedCopy)
         {
-            Save();
-            return;
+            long timestamp = DateTime.Now.Ticks;
+            string backupfile = Path.Combine(WorksetPath, $"data.{timestamp}.json");
+            if (File.Exists(WorksetDataFile)) File.Move(WorksetDataFile, backupfile);
         }
-        long timestamp = DateTime.UtcNow.Ticks;
-        string datafile = Path.Combine(WorksetPath, "data.json");
-        string backupfile = Path.Combine(WorksetPath, $"data.{timestamp}.json");
-        if (File.Exists(datafile)) File.Move(datafile, backupfile);
-        File.WriteAllText(datafile, JsonSerializer.Serialize(Value));
+        File.WriteAllText(WorksetDataFile, JsonSerializer.Serialize(Value));
     }
     public Workset<T> GetPriorVersionAsOfDate(DateTime dateTime)
     {
         //TODO Test this
         DateTime? closestDate = PriorVersionDates.Where(x => x >= dateTime)?.Min();
-        
-        if(closestDate is null) return this;
-        
+
+        if (closestDate is null) return this;
+
         string backupFilename = Path.Combine(WorksetPath, $"data.{closestDate?.Ticks.ToString()}.json");
 
         return new Workset<T>(WorksetId, WorksetPath, JsonSerializer.Deserialize<T>(File.ReadAllText(backupFilename)));

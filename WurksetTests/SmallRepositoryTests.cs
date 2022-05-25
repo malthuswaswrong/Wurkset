@@ -2,6 +2,7 @@ using Microsoft.Extensions.Options;
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using Wurkset;
 using Xunit;
 
@@ -9,7 +10,7 @@ namespace WurksetTests;
 
 public class SmallRepositoryTests
 {
-    const string baseDataDir = @"D:\src\WurksetSolution\TestData\Small";
+    readonly string baseDataDir = @$"{Directory.GetCurrentDirectory()}\TestData\Small";
     [Fact]
     public void CreateRepository()
     {
@@ -188,6 +189,72 @@ public class SmallRepositoryTests
         Assert.Equal(t1.WorksetId, t2.WorksetId);
         Assert.Equal("Version 1", t2.Value?.Data);
     }
-    //TODO Test UTC dates working properly for prior versions
-    //TODO Test archiving
+    [Fact]
+    public void TestArchiving()
+    {
+        WorksetRepositoryOptions options = new WorksetRepositoryOptions()
+        {
+            BasePath = Path.Combine(baseDataDir, "Archiving")
+        };
+        if (Directory.Exists(options.BasePath))
+        {
+            Directory.Delete(options.BasePath, true);
+        }
+        var ioptions = Options.Create(options);
+        WorksetRepository cut = new(ioptions);
+        Assert.Equal(1, cut.NextWorksetId);
+        Assert.True(Directory.Exists(options.BasePath));
+        Workset<TestData?> t1 = cut.Create(new TestData() { Id = 1, Data = "Version 1" });
+        var all = cut.GetAll<TestData>().ToList();
+        Assert.Single(all);
+        Workset<TestData> ws = cut.GetById<TestData>(1);
+        ws.Archive();
+        all = cut.GetAll<TestData>().ToList();
+        Assert.Empty(all);
+        all = cut.GetAll<TestData>(new GetAllOptions { IncludeArchived = true }).ToList();
+        Assert.Single(all);
+    }
+    [Fact]
+    public void TestSeachStartId()
+    {
+        WorksetRepositoryOptions options = new WorksetRepositoryOptions()
+        {
+            BasePath = Path.Combine(baseDataDir, "SearchStartId")
+        };
+        if (Directory.Exists(options.BasePath))
+        {
+            Directory.Delete(options.BasePath, true);
+        }
+        var ioptions = Options.Create(options);
+        WorksetRepository cut = new(ioptions);
+        for (int i = 0; i < 100; i++)
+        {
+            cut.Create(new TestData() { Id = i, Data = i.ToString() });
+        }
+        Assert.Equal(100, cut.GetAll<TestData>().Count());
+        Assert.Equal(100, cut.GetAll<TestData>(new GetAllOptions { StartId = 1 }).Count());
+        Assert.Equal(50, cut.GetAll<TestData>(new GetAllOptions { StartId = 51 }).Count());
+        Assert.Single(cut.GetAll<TestData>(new GetAllOptions { StartId = 100 }));
+        Assert.Empty(cut.GetAll<TestData>(new GetAllOptions { StartId = 101 }));
+    }
+    [Fact]
+    public void TestTimes()
+    {
+        WorksetRepositoryOptions options = new WorksetRepositoryOptions()
+        {
+            BasePath = Path.Combine(baseDataDir, "TestTimes")
+        };
+        if (Directory.Exists(options.BasePath))
+        {
+            Directory.Delete(options.BasePath, true);
+        }
+        var ioptions = Options.Create(options);
+        WorksetRepository cut = new(ioptions);
+        DateTime check = DateTime.Now;
+        Thread.Sleep(1000);
+        Workset<TestData?> t1 = cut.Create(new TestData() { Id = 1, Data = "Version 1" });
+        Assert.NotNull(t1);
+        Assert.True(t1.CreationTime >= check);
+        Assert.True(t1.LastWriteTime >= check);
+    }
 }
