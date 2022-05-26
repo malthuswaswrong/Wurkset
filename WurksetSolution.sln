@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32414.318
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WurksetTests", "WurksetTests\WurksetTests.csproj", "{CD375AE3-79EC-4284-BFC7-EF4BD7DEECAD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WurksetTests", "WurksetTests\WurksetTests.csproj", "{CD375AE3-79EC-4284-BFC7-EF4BD7DEECAD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wurkset", "Wurkset\Wurkset.csproj", "{4A4AB457-EE37-4225-9321-A569D02A6F44}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wurkset", "Wurkset\Wurkset.csproj", "{4A4AB457-EE37-4225-9321-A569D02A6F44}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FantasyTavern", "FantasyTavern\FantasyTavern.csproj", "{8420B119-73D6-4CF2-B16A-357856C9DA59}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{4A4AB457-EE37-4225-9321-A569D02A6F44}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4A4AB457-EE37-4225-9321-A569D02A6F44}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4A4AB457-EE37-4225-9321-A569D02A6F44}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8420B119-73D6-4CF2-B16A-357856C9DA59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8420B119-73D6-4CF2-B16A-357856C9DA59}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8420B119-73D6-4CF2-B16A-357856C9DA59}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8420B119-73D6-4CF2-B16A-357856C9DA59}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

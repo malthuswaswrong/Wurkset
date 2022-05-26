@@ -21,4 +21,6 @@ Filesystem storage has the advantage of being large and cheap.  This comes at th
 		* The Workset class provides the path to the workset.  Go nuts.  Just leave the data.json file alone.
 
 # TODO
+Create IWorkset
+Rename WorksetRepository to WorksetManager
 Write demo app
