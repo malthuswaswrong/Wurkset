@@ -7,7 +7,7 @@ public class Workset<T>
     public long WorksetId { get; }
     public string WorksetPath { get; }
     public string WorksetDataFile => (!Archived) ? Path.Combine(WorksetPath, "data.json") : Path.Combine(WorksetPath, "data.archived.json");
-    public T? Value { get; set; }
+    public T Value { get; set; }
     public bool Archived => (File.Exists(Path.Combine(WorksetPath, "data.archived.json")));
     public DateTime CreationTime => new DirectoryInfo(WorksetPath).CreationTime;
     public DateTime LastWriteTime => new FileInfo(WorksetDataFile).LastWriteTime;
@@ -32,7 +32,7 @@ public class Workset<T>
             return result;
         }
     }
-    public Workset(long worksetId, string worksetPath, T? value)
+    public Workset(long worksetId, string worksetPath, T value)
     {
         WorksetId = worksetId;
         WorksetPath = worksetPath;
@@ -57,7 +57,7 @@ public class Workset<T>
 
         string backupFilename = Path.Combine(WorksetPath, $"data.{closestDate?.Ticks.ToString()}.json");
 
-        return new Workset<T>(WorksetId, WorksetPath, JsonSerializer.Deserialize<T>(File.ReadAllText(backupFilename)));
+        return new Workset<T>(WorksetId, WorksetPath, JsonSerializer.Deserialize<T>(File.ReadAllText(backupFilename)) ?? throw new Exception("Could not deserialize backup file"));
     }
     public void Archive()
     {

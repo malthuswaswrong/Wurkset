@@ -11,7 +11,7 @@ public class WorksetRepository
         get
         {
             long result = lastWorksetId;
-            while (Directory.Exists(Path.Combine(options.BasePath, result.ToPath())))
+            while (Directory.Exists(Path.Combine(Options.Value.BasePath, result.ToPath())))
             {
                 result++;
             }
@@ -19,37 +19,41 @@ public class WorksetRepository
             return result;
         }
     }
-    private string pathBulder(long id) => Path.Combine(options.BasePath, id.ToPath(), "ws");
-    private readonly WorksetRepositoryOptions options;
+    private string pathBulder(long id) => Path.Combine(Options.Value.BasePath, id.ToPath(), "ws");
+    public readonly IOptions<WorksetRepositoryOptions> Options;
 
-    public WorksetRepository(IOptions<WorksetRepositoryOptions> ioptions)
+    public WorksetRepository(IOptions<WorksetRepositoryOptions> options)
     {
-        this.options = ioptions.Value;
-        if(String.Compare(this.options.BasePath, @"c:\", true ) == 0)
+        this.Options = options;
+        if (String.IsNullOrWhiteSpace(options.Value.BasePath))
+        {
+            throw new ArgumentException("BasePath is not set");
+        }
+        if (String.Compare(this.Options.Value.BasePath, @"c:\", true ) == 0)
         {
             //I'm not taking on the responsibility of this library bricking someone's C drive
-            throw new Exception(@"You're not allowed to use C:\ as the base path.");
+            throw new ArgumentException(@"You're not allowed to use C:\ as the base path.");
         }
-        if (!Directory.Exists(this.options.BasePath))
+        if (!Directory.Exists(this.Options.Value.BasePath))
         {
-            Directory.CreateDirectory(this.options.BasePath);
+            Directory.CreateDirectory(this.Options.Value.BasePath);
         }
-        if (!Directory.Exists(Path.Combine(this.options.BasePath, "0")))
+        if (!Directory.Exists(Path.Combine(this.Options.Value.BasePath, "0")))
         {
             //Reserve directory "0" for internal use.
-            Directory.CreateDirectory(Path.Combine(this.options.BasePath, "0"));
+            Directory.CreateDirectory(Path.Combine(this.Options.Value.BasePath, "0"));
         }
         lastWorksetId = QueryLastUsedId();
     }
     private long QueryLastUsedId()
     {
-        if (!Directory.Exists(Path.Combine(options.BasePath, "1")))
+        if (!Directory.Exists(Path.Combine(Options.Value.BasePath, "1")))
         {
             return 1;
         }
         
         long maxSearch = 2;        
-        while (Directory.Exists(Path.Combine(options.BasePath, maxSearch.ToPath())))
+        while (Directory.Exists(Path.Combine(Options.Value.BasePath, maxSearch.ToPath())))
         {
             maxSearch *= 2;
         }
@@ -65,7 +69,7 @@ public class WorksetRepository
             return min;
         }
         long mid = (min + max) / 2;
-        if (Directory.Exists(Path.Combine(options.BasePath, mid.ToPath())))
+        if (Directory.Exists(Path.Combine(Options.Value.BasePath, mid.ToPath())))
         {
             return BinarySearch(mid, max);
         }
@@ -84,7 +88,7 @@ public class WorksetRepository
         File.WriteAllText(datafile, JsonSerializer.Serialize(data));
         return new Workset<T>(newId, path, data);
     }
-    public Workset<T?> GetById<T>(long id)
+    public Workset<T> GetById<T>(long id)
     {
         string path = pathBulder(id);
         string datafile = Path.Combine(path, "data.json");
@@ -92,10 +96,10 @@ public class WorksetRepository
         {
             throw new FileNotFoundException($"Workset {id} not found");
         }
-        T? data = JsonSerializer.Deserialize<T>(File.ReadAllText(datafile));
-        return new Workset<T?>(id, path, data);
+        T data = JsonSerializer.Deserialize<T>(File.ReadAllText(datafile)) ?? throw new Exception("Data is null");
+        return new Workset<T>(id, path, data);
     }
-    public IEnumerable<Workset<T?>> GetAll<T>(GetAllOptions? getOptions = null)
+    public IEnumerable<Workset<T>> GetAll<T>(GetAllOptions? getOptions = null)
     {
         long id = getOptions != null && getOptions.StartId.HasValue ? getOptions.StartId.Value : 1;
         for (; id < NextWorksetId; id++)
@@ -105,8 +109,8 @@ public class WorksetRepository
 
             if (File.Exists(datafile))
             {
-                T? data = JsonSerializer.Deserialize<T>(File.ReadAllText(datafile));
-                yield return new Workset<T?>(id, path, data);
+                T data = JsonSerializer.Deserialize<T>(File.ReadAllText(datafile)) ?? throw new Exception("Data is null");
+                yield return new Workset<T>(id, path, data);
             }
             else
             {
@@ -115,8 +119,8 @@ public class WorksetRepository
                     datafile = Path.Combine(path, "data.archived.json");
                     if (File.Exists(datafile))
                     {
-                        T? data = JsonSerializer.Deserialize<T>(File.ReadAllText(datafile));
-                        yield return new Workset<T?>(id, path, data);
+                        T data = JsonSerializer.Deserialize<T>(File.ReadAllText(datafile)) ?? throw new Exception("Data is null");
+                        yield return new Workset<T>(id, path, data);
                     }
                 }
             }

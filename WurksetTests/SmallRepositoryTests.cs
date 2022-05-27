@@ -10,7 +10,15 @@ namespace WurksetTests;
 
 public class SmallRepositoryTests
 {
-    readonly string baseDataDir = @$"{Directory.GetCurrentDirectory()}\TestData\Small";
+    readonly string baseDataDir = Path.Combine(Directory.GetCurrentDirectory(), "TestData", "Small");
+    [Fact]
+    public void InvalidBaseDirectory()
+    {
+        Assert.Throws<ArgumentException>(() => new WorksetRepository(Options.Create(new WorksetRepositoryOptions())));
+        Assert.Throws<ArgumentException>(() => new WorksetRepository(Options.Create(new WorksetRepositoryOptions() { BasePath = "" })));
+        Assert.Throws<ArgumentException>(() => new WorksetRepository(Options.Create(new WorksetRepositoryOptions() { BasePath = "c:\\" })));
+        Assert.Throws<IOException>(() => new WorksetRepository(Options.Create(new WorksetRepositoryOptions() { BasePath = "?invalid*" })));
+    }
     [Fact]
     public void CreateRepository()
     {
@@ -69,7 +77,7 @@ public class SmallRepositoryTests
             cut.Create(new TestData() { Id = i, Data = i.ToString() });
         }
         
-        Workset<TestData?> verify = cut.GetById<TestData>(10);
+        Workset<TestData> verify = cut.GetById<TestData>(10);
         Assert.NotNull(verify);
         Assert.Equal(10, verify.Value?.Id);
         Assert.Equal("10", verify.Value?.Data);
@@ -141,7 +149,7 @@ public class SmallRepositoryTests
         {
             Directory.Delete(options.BasePath, true);
         }
-        var ioptions = Options.Create(options);
+        IOptions<WorksetRepositoryOptions> ioptions = Options.Create(options);
         WorksetRepository cut = new(ioptions);
         Assert.Equal(1, cut.NextWorksetId);
         Assert.True(Directory.Exists(options.BasePath));
@@ -149,10 +157,10 @@ public class SmallRepositoryTests
         Assert.NotNull(t1);
         Assert.Equal(1, t1.WorksetId);
         Assert.NotNull(t1.Value);
-        Assert.Equal("1", t1.Value?.Data);
+        Assert.Equal("1", t1.Value.Data);
         t1.Value.Data = t1.Value?.Data + " a change";
         t1.Save();
-        Workset<TestData?> t2 = cut.GetById<TestData>(1);
+        Workset<TestData> t2 = cut.GetById<TestData>(1);
         Assert.NotNull(t2);
         Assert.NotNull(t2.Value);
         Assert.Equal("1 a change", t2.Value?.Data);
@@ -172,10 +180,10 @@ public class SmallRepositoryTests
         WorksetRepository cut = new(ioptions);
         Assert.Equal(1, cut.NextWorksetId);
         Assert.True(Directory.Exists(options.BasePath));
-        Workset<TestData?> t1 = cut.Create(new TestData() { Id = 1, Data = "Version 1" });
+        Workset<TestData> t1 = cut.Create(new TestData() { Id = 1, Data = "Version 1" });
         Assert.NotNull(t1);
         Assert.NotNull(t1.Value);
-        Assert.Equal("Version 1", t1.Value?.Data);
+        Assert.Equal("Version 1", t1.Value.Data);
         Assert.Empty(t1.PriorVersionDates);
         t1.Value.Data = "Version 2";
         t1.Save(true);
@@ -184,7 +192,7 @@ public class SmallRepositoryTests
         Assert.NotNull(t1.Value);
         Assert.Equal("Version 2", t1.Value?.Data);
         
-        Workset<TestData?> t2 = t1.GetPriorVersionAsOfDate(DateTime.Parse("1901-01-01"));
+        Workset<TestData> t2 = t1.GetPriorVersionAsOfDate(DateTime.Parse("1901-01-01"));
         Assert.NotNull(t2);
         Assert.Equal(t1.WorksetId, t2.WorksetId);
         Assert.Equal("Version 1", t2.Value?.Data);
@@ -204,7 +212,7 @@ public class SmallRepositoryTests
         WorksetRepository cut = new(ioptions);
         Assert.Equal(1, cut.NextWorksetId);
         Assert.True(Directory.Exists(options.BasePath));
-        Workset<TestData?> t1 = cut.Create(new TestData() { Id = 1, Data = "Version 1" });
+        cut.Create(new TestData() { Id = 1, Data = "Version 1" });
         var all = cut.GetAll<TestData>().ToList();
         Assert.Single(all);
         Workset<TestData> ws = cut.GetById<TestData>(1);
@@ -252,7 +260,7 @@ public class SmallRepositoryTests
         WorksetRepository cut = new(ioptions);
         DateTime check = DateTime.Now;
         Thread.Sleep(1000);
-        Workset<TestData?> t1 = cut.Create(new TestData() { Id = 1, Data = "Version 1" });
+        Workset<TestData> t1 = cut.Create(new TestData() { Id = 1, Data = "Version 1" });
         Assert.NotNull(t1);
         Assert.True(t1.CreationTime >= check);
         Assert.True(t1.LastWriteTime >= check);
