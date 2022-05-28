@@ -197,31 +197,7 @@ public class SmallRepositoryTests
         Assert.Equal(t1.WorksetId, t2.WorksetId);
         Assert.Equal("Version 1", t2.Value?.Data);
     }
-    [Fact]
-    public void TestArchiving()
-    {
-        WorksetRepositoryOptions options = new WorksetRepositoryOptions()
-        {
-            BasePath = Path.Combine(baseDataDir, "Archiving")
-        };
-        if (Directory.Exists(options.BasePath))
-        {
-            Directory.Delete(options.BasePath, true);
-        }
-        var ioptions = Options.Create(options);
-        WorksetRepository cut = new(ioptions);
-        Assert.Equal(1, cut.NextWorksetId);
-        Assert.True(Directory.Exists(options.BasePath));
-        cut.Create(new TestData() { Id = 1, Data = "Version 1" });
-        var all = cut.GetAll<TestData>().ToList();
-        Assert.Single(all);
-        Workset<TestData> ws = cut.GetById<TestData>(1);
-        ws.Archive();
-        all = cut.GetAll<TestData>().ToList();
-        Assert.Empty(all);
-        all = cut.GetAll<TestData>(new GetAllOptions { IncludeArchived = true }).ToList();
-        Assert.Single(all);
-    }
+    
     [Fact]
     public void TestSeachStartId()
     {

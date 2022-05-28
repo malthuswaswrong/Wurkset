@@ -3,5 +3,5 @@
 public class GetAllOptions
 {
     public long? StartId { get; set; }
-    public bool? IncludeArchived { get; set; }
+    public bool? Descending { get; set; }
 }

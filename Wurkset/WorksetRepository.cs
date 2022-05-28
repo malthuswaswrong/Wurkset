@@ -29,7 +29,7 @@ public class WorksetRepository
         {
             throw new ArgumentException("BasePath is not set");
         }
-        if (String.Compare(this.Options.Value.BasePath, @"c:\", true ) == 0)
+        if (String.Compare(this.Options.Value.BasePath, @"c:\", true) == 0)
         {
             //I'm not taking on the responsibility of this library bricking someone's C drive
             throw new ArgumentException(@"You're not allowed to use C:\ as the base path.");
@@ -43,23 +43,22 @@ public class WorksetRepository
             //Reserve directory "0" for internal use.
             Directory.CreateDirectory(Path.Combine(this.Options.Value.BasePath, "0"));
         }
-        lastWorksetId = QueryLastUsedId();
+        FixNextWorksetId();
     }
-    private long QueryLastUsedId()
+    private void FixNextWorksetId()
     {
         if (!Directory.Exists(Path.Combine(Options.Value.BasePath, "1")))
         {
-            return 1;
+            lastWorksetId = 0;
         }
-        
-        long maxSearch = 2;        
+
+        long maxSearch = 2;
         while (Directory.Exists(Path.Combine(Options.Value.BasePath, maxSearch.ToPath())))
         {
             maxSearch *= 2;
         }
         long minSearch = maxSearch / 2;
-        long result = BinarySearch(minSearch, maxSearch);
-        return result;
+        lastWorksetId = BinarySearch(minSearch, maxSearch);
     }
 
     private long BinarySearch(long min, long max)
@@ -84,17 +83,17 @@ public class WorksetRepository
         long newId = NextWorksetId;
         string path = pathBulder(newId);
         Directory.CreateDirectory(path);
-        string datafile = Path.Combine(path, "data.json");
+        string datafile = Path.Combine(path, $"{typeof(T).Name}.json");
         File.WriteAllText(datafile, JsonSerializer.Serialize(data));
         return new Workset<T>(newId, path, data);
     }
     public Workset<T> GetById<T>(long id)
     {
         string path = pathBulder(id);
-        string datafile = Path.Combine(path, "data.json");
+        string datafile = Path.Combine(path, $"{typeof(T).Name}.json");
         if (!File.Exists(datafile))
         {
-            throw new FileNotFoundException($"Workset {id} not found");
+            throw new FileNotFoundException($"Workset of type {nameof(T)} with id {id} not found");
         }
         T data = JsonSerializer.Deserialize<T>(File.ReadAllText(datafile)) ?? throw new Exception("Data is null");
         return new Workset<T>(id, path, data);
@@ -102,27 +101,24 @@ public class WorksetRepository
     public IEnumerable<Workset<T>> GetAll<T>(GetAllOptions? getOptions = null)
     {
         long id = getOptions != null && getOptions.StartId.HasValue ? getOptions.StartId.Value : 1;
-        for (; id < NextWorksetId; id++)
+        int step = 1;
+        if (getOptions != null && getOptions.Descending.HasValue && getOptions.Descending.Value)
+        {
+            step = -1;
+            if (!getOptions.StartId.HasValue)
+            {
+                id = NextWorksetId - 1;
+            }
+        }
+        for (; id < NextWorksetId; id += step)
         {
             string path = pathBulder(id);
-            string datafile = Path.Combine(path, "data.json");
+            string datafile = Path.Combine(path, $"{typeof(T).Name}.json");
 
             if (File.Exists(datafile))
             {
                 T data = JsonSerializer.Deserialize<T>(File.ReadAllText(datafile)) ?? throw new Exception("Data is null");
                 yield return new Workset<T>(id, path, data);
-            }
-            else
-            {
-                if (getOptions != null && getOptions.IncludeArchived.HasValue && getOptions.IncludeArchived.Value)
-                {
-                    datafile = Path.Combine(path, "data.archived.json");
-                    if (File.Exists(datafile))
-                    {
-                        T data = JsonSerializer.Deserialize<T>(File.ReadAllText(datafile)) ?? throw new Exception("Data is null");
-                        yield return new Workset<T>(id, path, data);
-                    }
-                }
             }
         }
     }

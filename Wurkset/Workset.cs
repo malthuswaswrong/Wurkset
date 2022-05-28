@@ -6,9 +6,8 @@ public class Workset<T>
 {
     public long WorksetId { get; }
     public string WorksetPath { get; }
-    public string WorksetDataFile => (!Archived) ? Path.Combine(WorksetPath, "data.json") : Path.Combine(WorksetPath, "data.archived.json");
+    public string WorksetDataFile => Path.Combine(WorksetPath, $"{typeof(T).Name}.json");
     public T Value { get; set; }
-    public bool Archived => (File.Exists(Path.Combine(WorksetPath, "data.archived.json")));
     public DateTime CreationTime => new DirectoryInfo(WorksetPath).CreationTime;
     public DateTime LastWriteTime => new FileInfo(WorksetDataFile).LastWriteTime;
     public List<DateTime> PriorVersionDates
@@ -16,7 +15,7 @@ public class Workset<T>
         get
         {
             List<DateTime> result = new();
-            foreach (var backupFile in Directory.GetFiles(WorksetPath, "data.*.json"))
+            foreach (var backupFile in Directory.GetFiles(WorksetPath, $"{typeof(T).Name}.*.json"))
             {
                 string fname = Path.GetFileName(backupFile);
                 if (long.TryParse(fname.Split('.')[1], out long timestamp))
@@ -43,7 +42,7 @@ public class Workset<T>
         if (keepVersionedCopy)
         {
             long timestamp = DateTime.Now.Ticks;
-            string backupfile = Path.Combine(WorksetPath, $"data.{timestamp}.json");
+            string backupfile = Path.Combine(WorksetPath, $"{typeof(T).Name}.{timestamp}.json");
             if (File.Exists(WorksetDataFile)) File.Move(WorksetDataFile, backupfile);
         }
         File.WriteAllText(WorksetDataFile, JsonSerializer.Serialize(Value));
@@ -55,14 +54,8 @@ public class Workset<T>
 
         if (closestDate is null) return this;
 
-        string backupFilename = Path.Combine(WorksetPath, $"data.{closestDate?.Ticks.ToString()}.json");
+        string backupFilename = Path.Combine(WorksetPath, $"{typeof(T).Name}.{closestDate?.Ticks.ToString()}.json");
 
         return new Workset<T>(WorksetId, WorksetPath, JsonSerializer.Deserialize<T>(File.ReadAllText(backupFilename)) ?? throw new Exception("Could not deserialize backup file"));
-    }
-    public void Archive()
-    {
-        string datafile = Path.Combine(WorksetPath, "data.json");
-        string archivefile = Path.Combine(WorksetPath, "data.archived.json");
-        if (File.Exists(datafile)) File.Move(datafile, archivefile);
     }
 }
