@@ -58,4 +58,8 @@ public class Workset<T>
 
         return new Workset<T>(WorksetId, WorksetPath, JsonSerializer.Deserialize<T>(File.ReadAllText(backupFilename)) ?? throw new Exception("Could not deserialize backup file"));
     }
+    public void Delete()
+    {
+        if (File.Exists(WorksetDataFile)) File.Delete(WorksetDataFile);
+    }
 }
