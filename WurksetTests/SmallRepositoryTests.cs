@@ -35,7 +35,8 @@ public class SmallRepositoryTests
     }
     [Fact]
     public void CreateRepository()
-    {Assert.Equal(1, cut.NextWorksetId);
+    {
+        Assert.Equal(1, cut.NextWorksetId);
         Assert.True(Directory.Exists(basePath));
     }
     [Fact]
