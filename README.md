@@ -94,6 +94,8 @@ wsInstance.WorksetPath;
 
 
 # TODO
+* [ ] Create automated build
+* [ ] Create NuGet
 * [ ] Create IWorkset interface
 * [ ] Add "Rename"
 	* Ex: Rename class from A to B
