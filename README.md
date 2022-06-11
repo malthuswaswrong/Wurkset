@@ -100,5 +100,5 @@ wsInstance.WorksetPath;
 	* Ex: Rename class from A to B
 * [ ] Add Optional Index
 	* Should be able to tag a property in the class with an attribute that will mark it as an index.
-	* Then app will index on that attribute for faster searching
+	* Then library will index on that attribute for faster searching
 		* This is hard, but worth it for long term.
