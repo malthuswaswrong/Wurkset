@@ -34,7 +34,7 @@ IHost host = Host.CreateDefaultBuilder()
 ```
 ## Create a workset
 ```
-Workset<TestDataA> wsNew = cut.Create(new TestDataA() { Id = 1, Data = "Some test data" });
+Workset<TestDataA> wsNew = wsr.Create(new TestDataA() { Id = 1, Data = "Some test data" });
 ```
 ## Save a workset
 ```
@@ -42,12 +42,12 @@ wsInstance.Save();
 ```
 ## Get a workset by id
 ```
-Workset<TestDataA> verify = cut.GetById<TestDataA>(10);
+Workset<TestDataA> verify = wsr.GetById<TestDataA>(10);
 ```
 ## Enumerate all worksets
 ```
 int chk = 1;
-foreach(Workset<TestDataA> t in cut.GetAll<TestDataA>())
+foreach(Workset<TestDataA> t in wsr.GetAll<TestDataA>())
 {
     Assert.Equal(chk, t.WorksetId);
     Assert.Equal(chk, t.Value?.Id);
@@ -57,7 +57,7 @@ foreach(Workset<TestDataA> t in cut.GetAll<TestDataA>())
 ```
 ## Search for a workset(s)
 ```
-List<TestDataA> wsList = cut.GetAll<TestDataA>()
+List<TestDataA> wsList = wsr.GetAll<TestDataA>()
             .Where(x => x.Value?.Data.Contains("test"))
             .Select(x => x.Value)
             .ToList();
