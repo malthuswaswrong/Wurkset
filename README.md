@@ -67,6 +67,7 @@ List<TestDataA> wsList = wsr.GetAll<TestDataA>()
 ```
 wsInstance.WorksetPath;
 ```
+# Additional Notes
 * Be cautious about:
 	* Concurrency.  You have to wait for the hard drive.  Consider implementing as a singleton.
 	* Storing different classes in the same base directory.  Workset will enumerate faster if everything in the directory is the same class type.  It's simple to store each class in it's own directory.  Ex:
@@ -91,8 +92,7 @@ wsInstance.WorksetPath;
 		* See examples below for more information
 	* What about race conditions?
 		* I *think* filesystems are atomic, at least when creating directories, so there *shouldn't* be any issues with parallelism, but I'm not an expert and could be wrong.  I hope to write tests to prove this in the future.  This is in the context of creating new Worksets.  Use regular caution when saving worksets.
-## Important notes
-* The repository BasePath can be either a full path or a relative path.  If relative it will be the executing assembly's working directory.
+
 
 # TODO
 * [ ] Create IWorkset interface
