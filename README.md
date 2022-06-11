@@ -11,7 +11,7 @@ Filesystem storage has the advantage of being large and cheap.  This comes at th
 ## Create a repository
 ### Directly make an IOptions object
 ```
-WorksetRepositoryOptions options = new WorksetRepositoryOptions() { BasePath = @"c:\Data" };
+WorksetRepositoryOptions options = new() { BasePath = @"c:\Data" };
 var ioptions = Options.Create(options);
 WorksetRepository wsr = new(ioptions);
 ```
