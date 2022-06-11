@@ -92,6 +92,8 @@ wsInstance.WorksetPath;
 	* What about race conditions?
 		* I *think* filesystems are atomic, at least when creating directories, so there *shouldn't* be any issues with parallelism, but I'm not an expert and could be wrong.  I hope to write tests to prove this in the future.  This is in the context of creating new Worksets.  Use regular caution when saving worksets.
 
+# WeightTracker
+A simple WinForms application to "dog food" the repository.
 
 # TODO
 * [ ] Create automated build
