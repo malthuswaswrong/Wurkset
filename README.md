@@ -34,7 +34,7 @@ IHost host = Host.CreateDefaultBuilder()
 ```
 ## Create a workset
 ```
-Workset<TestDataA> wsNew = wsr.Create(new TestDataA() { Id = 1, Data = "Some test data" });
+Workset<TestDataA> wsInstance = wsr.Create(new TestDataA() { Id = 1, Data = "Some test data" });
 ```
 ## Save a workset
 ```
