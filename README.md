@@ -81,7 +81,7 @@ wsInstance.WorksetPath;
 		* This structure allows a large number of worksets to be created without creating a very long path, prevents any one directory from having a massive number of files, allows rapid direct access by id, and allows a straight forward binary search to find the "next id" by checking Directory.Exists.
 	* How do I get the identity of the workset that was just created?
 		* When you create or retrieve a workset it is wrapped in a generic class that contains WorksetId, WorksetPath, and various other properties.
-		* See examples below for more information
+		* See unit tests or examples for more information
 	* What about race conditions?
 		* I *think* filesystems are atomic, at least when creating directories, so there *shouldn't* be any issues with parallelism, but I'm not an expert and could be wrong.  I hope to write tests to prove this in the future.  This is in the context of creating new Worksets.  Use regular caution when saving worksets.
 * Be cautious about:
