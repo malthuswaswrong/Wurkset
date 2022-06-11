@@ -102,4 +102,4 @@ wsInstance.WorksetPath;
 * [ ] Add Optional Index
 	* Should be able to tag a property in the class with an attribute that will mark it as an index.
 	* Then library will index on that attribute for faster searching
-		* This is hard, but worth it for long term.
+	* This is hard, but worth it for long term.
