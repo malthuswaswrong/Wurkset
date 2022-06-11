@@ -42,16 +42,16 @@ wsInstance.Save();
 ```
 ## Get a workset by id
 ```
-Workset<TestDataA> verify = wsr.GetById<TestDataA>(10);
+Workset<TestDataA> wsInstance = wsr.GetById<TestDataA>(10);
 ```
 ## Enumerate all worksets
 ```
 int chk = 1;
-foreach(Workset<TestDataA> t in wsr.GetAll<TestDataA>())
+foreach(Workset<TestDataA> wsInstance in wsr.GetAll<TestDataA>())
 {
-    Assert.Equal(chk, t.WorksetId);
-    Assert.Equal(chk, t.Value?.Id);
-    Assert.Equal(chk.ToString(), t.Value?.Data);
+    Assert.Equal(chk, wsInstance.WorksetId);
+    Assert.Equal(chk, wsInstance.Value?.Id);
+    Assert.Equal(chk.ToString(), wsInstance.Value?.Data);
     chk++;
 }
 ```
