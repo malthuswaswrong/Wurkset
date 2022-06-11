@@ -19,14 +19,10 @@ Filesystem storage has the advantage of being large and cheap.  This comes at th
 		* The Workset class provides the path to the workset.  Go nuts.  Just leave the nameof(T).json file alone.
 
 # TODO
-* Create IWorkset
-* Write demo app
-* Add Delete
+* Create IWorkset interface
 * Add "Rename"
 	* Rename class from A to B
 * Add Optional Index
-	* Should be able to tag a property in the class with an attribute that will	mark it as an index.
+	* Should be able to tag a property in the class with an attribute that will mark it as an index.
 	* Then app will index on that attribute for faster searching
 		* This is hard, but worth it for long term.
-* Look into ImageSharp for the FantasyTavern
-	* Quest PDF to geneate PDFs
