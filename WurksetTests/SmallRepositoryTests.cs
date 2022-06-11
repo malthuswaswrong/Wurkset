@@ -153,4 +153,15 @@ public class SmallRepositoryTests
         Assert.True(t1.CreationTime >= check);
         Assert.True(t1.LastWriteTime >= check);
     }
+    [Fact]
+    public void MultipleDataTypesInSameRepo()
+    {
+        for (int i = 1; i <= 10; i++)
+        {
+            cut.Create(new TestDataA() { Id = i, Data = i.ToString() });
+            cut.Create(new TestDataB() { ChosenFruit = TestDataB.FRUITS.Apple });
+        }
+        Assert.Equal(10, cut.GetAll<TestDataA>().Count());
+        Assert.Equal(10, cut.GetAll<TestDataB>().Count());
+    }
 }

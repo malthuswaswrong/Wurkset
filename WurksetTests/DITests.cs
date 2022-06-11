@@ -26,7 +26,7 @@ public class DITests
     [Fact]
     public void ConfirmBasePath()
     {
-        Assert.Equal(BaseDir, wurkset?.Options.Value.BasePath);
+        Assert.Equal(BaseDir, wurkset?.WorksetRepositoryOptions.Value.BasePath);
         Assert.True(Directory.Exists(BaseDir));
     }
     

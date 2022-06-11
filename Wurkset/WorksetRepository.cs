@@ -11,7 +11,7 @@ public class WorksetRepository
         get
         {
             long result = lastWorksetId;
-            while (Directory.Exists(Path.Combine(Options.Value.BasePath, result.ToPath())))
+            while (Directory.Exists(Path.Combine(WorksetRepositoryOptions.Value.BasePath, result.ToPath())))
             {
                 result++;
             }
@@ -19,41 +19,47 @@ public class WorksetRepository
             return result;
         }
     }
-    private string pathBulder(long id) => Path.Combine(Options.Value.BasePath, id.ToPath(), "ws");
-    public readonly IOptions<WorksetRepositoryOptions> Options;
+    private string pathBulder(long id) => Path.Combine(WorksetRepositoryOptions.Value.BasePath, id.ToPath(), "ws");
+    public readonly IOptions<WorksetRepositoryOptions> WorksetRepositoryOptions;
 
     public WorksetRepository(IOptions<WorksetRepositoryOptions> options)
     {
-        this.Options = options;
+        this.WorksetRepositoryOptions = options;
         if (String.IsNullOrWhiteSpace(options.Value.BasePath))
         {
             throw new ArgumentException("BasePath is not set");
         }
-        if (String.Compare(this.Options.Value.BasePath, @"c:\", true) == 0)
+        if (String.Compare(this.WorksetRepositoryOptions.Value.BasePath, @"c:\", true) == 0)
         {
             //I'm not taking on the responsibility of this library bricking someone's C drive
             throw new ArgumentException(@"You're not allowed to use C:\ as the base path.");
         }
-        if (!Directory.Exists(this.Options.Value.BasePath))
+        if (!Directory.Exists(this.WorksetRepositoryOptions.Value.BasePath))
         {
-            Directory.CreateDirectory(this.Options.Value.BasePath);
+            Directory.CreateDirectory(this.WorksetRepositoryOptions.Value.BasePath);
         }
-        if (!Directory.Exists(Path.Combine(this.Options.Value.BasePath, "0")))
+        if (!Directory.Exists(Path.Combine(this.WorksetRepositoryOptions.Value.BasePath, "0")))
         {
             //Reserve directory "0" for internal use.
-            Directory.CreateDirectory(Path.Combine(this.Options.Value.BasePath, "0"));
+            Directory.CreateDirectory(Path.Combine(this.WorksetRepositoryOptions.Value.BasePath, "0"));
         }
         FixNextWorksetId();
     }
+    public WorksetRepository(Action<WorksetRepositoryOptions> configuration)
+    {
+        WorksetRepositoryOptions options = new WorksetRepositoryOptions();
+        configuration(options);
+        this.WorksetRepositoryOptions =  Options.Create(options);
+    }
     private void FixNextWorksetId()
     {
-        if (!Directory.Exists(Path.Combine(Options.Value.BasePath, "1")))
+        if (!Directory.Exists(Path.Combine(WorksetRepositoryOptions.Value.BasePath, "1")))
         {
             lastWorksetId = 0;
         }
 
         long maxSearch = 2;
-        while (Directory.Exists(Path.Combine(Options.Value.BasePath, maxSearch.ToPath())))
+        while (Directory.Exists(Path.Combine(WorksetRepositoryOptions.Value.BasePath, maxSearch.ToPath())))
         {
             maxSearch *= 2;
         }
@@ -68,7 +74,7 @@ public class WorksetRepository
             return min;
         }
         long mid = (min + max) / 2;
-        if (Directory.Exists(Path.Combine(Options.Value.BasePath, mid.ToPath())))
+        if (Directory.Exists(Path.Combine(WorksetRepositoryOptions.Value.BasePath, mid.ToPath())))
         {
             return BinarySearch(mid, max);
         }
