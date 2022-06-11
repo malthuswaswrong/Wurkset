@@ -9,7 +9,7 @@ Filesystem storage has the advantage of being large and cheap.  This comes at th
 
 # Example Code
 ## Create a repository
-### Directly make an options object
+### Directly make an IOptions object
 ```
 WorksetRepositoryOptions options = new WorksetRepositoryOptions() { BasePath = @"c:\Data" };
 var ioptions = Options.Create(options);
