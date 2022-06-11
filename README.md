@@ -26,7 +26,7 @@ Filesystem storage has the advantage of being large and cheap.  This comes at th
 				* WorksetId 1: {BasePath}\1
 				* WorksetId 11: {BasePath}\1\1
 				* WorksetId 123456: {BasePath}\1\2\3\4\5\6
-			* This structure allows a large number of worksets to be created without creating a very long path, prevents any one directory from having a massive number of files, and allows rapid direct access by id
+			* This structure allows a large number of worksets to be created without creating a very long path, prevents any one directory from having a massive number of files, allows rapid direct access by id, and allows a straight forward binary search to find the "next id" by checking Directory.Exists.
 		* How do I get the identity of the workset that was just created?
 			* When you create or retrieve a workset it is wrapped in a generic class that contains WorksetId, WorksetPath, and various other properties.
 			* See examples below for more information
