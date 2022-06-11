@@ -8,7 +8,7 @@ Wurkset lets you define a unit of work with a POCO.  You can easily create and s
 Filesystem storage has the advantage of being large and cheap.  This comes at the tradeoff of speed.
 
 * Be cautious about:
-	* Concurrency.  You have to wait for the hard drive.  Consider injecting as a singleton.
+	* Concurrency.  You have to wait for the hard drive.  Consider implementing as a singleton.
 	* Storing different classes in the same base directory.  Workset will enumerate faster if everything in the directory is the same class type.  It's simple to store each class in it's own directory.  Ex:
 		* C:\Data\ClassA
 		* C:\Data\ClassB
