@@ -17,19 +17,20 @@ Filesystem storage has the advantage of being large and cheap.  This comes at th
 * FAQ:
  	* Why?
  		* Mostly I want to learn how to make a GitHub repo and this is a project I've thought about for a long time.  I started programming in the late 90's at a company that didn't have a database and I spent many years managing large sets of data exclusivly through the filesystem.  It's a good cheap solution for "cold data" that doesn't need fast access or as a stand in for a real repository during development.
-	* How
-		* How can I store extra files?
-			* The Workset class provides the path to the workset.  Go nuts.  Just leave the nameof(T).json file alone.
-		* How does Wurkset store the files?
-			* Classes are stored on the filesystem in a nested subdirectory structure.  The identity is the combination of these subdirectories cast to a long
-			* Example:
-				* WorksetId 1: {BasePath}\1
-				* WorksetId 11: {BasePath}\1\1
-				* WorksetId 123456: {BasePath}\1\2\3\4\5\6
-			* This structure allows a large number of worksets to be created without creating a very long path, prevents any one directory from having a massive number of files, allows rapid direct access by id, and allows a straight forward binary search to find the "next id" by checking Directory.Exists.
-		* How do I get the identity of the workset that was just created?
-			* When you create or retrieve a workset it is wrapped in a generic class that contains WorksetId, WorksetPath, and various other properties.
-			* See examples below for more information
+	* How can I store extra files?
+		* The Workset class provides the path to the workset.  Go nuts.  Just leave the nameof(T).json file alone.
+	* How does Wurkset store the files?
+		* Classes are stored on the filesystem in a nested subdirectory structure.  The identity is the combination of these subdirectories cast to a long
+		* Example:
+			* WorksetId 1: {BasePath}\1
+			* WorksetId 11: {BasePath}\1\1
+			* WorksetId 123456: {BasePath}\1\2\3\4\5\6
+		* This structure allows a large number of worksets to be created without creating a very long path, prevents any one directory from having a massive number of files, allows rapid direct access by id, and allows a straight forward binary search to find the "next id" by checking Directory.Exists.
+	* How do I get the identity of the workset that was just created?
+		* When you create or retrieve a workset it is wrapped in a generic class that contains WorksetId, WorksetPath, and various other properties.
+		* See examples below for more information
+	* What about race conditions?
+		* I *think* filesystems are atomic, at least when creating directories, so there *shouldn't* be any issues with parallelism, but I'm not an expert and could be wrong.  I hope to write tests to prove this in the future.  This is in the context of creating new Worksets.  Use regular caution when saving worksets.
 # Example Code
 ## Create a repository
 ### Directly make an options object
