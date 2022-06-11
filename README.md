@@ -64,7 +64,7 @@ List<TestDataA> wsList = wsr.GetAll<TestDataA>()
 ```
 ## Access the path of a workset
 ```
-wsData.WorksetPath;
+wsInstance.WorksetPath;
 ```
 * Be cautious about:
 	* Concurrency.  You have to wait for the hard drive.  Consider implementing as a singleton.
