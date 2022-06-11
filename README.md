@@ -5,8 +5,6 @@ A workset is a unit of work.
 
 Wurkset lets you define a unit of work with a POCO.  You can easily create and save worksets to a filesystem.  You can enumerate over the full collection and filter with traditional Linq.
 
-Filesystem storage has the advantage of being large and cheap.  This comes at the tradeoff of speed.
-
 # Example Code
 The unit tests are a great way to explore the capabilities of the library, but here are a few common tasks.
 ## Instantiate a repository
@@ -77,6 +75,7 @@ wsInstance.WorksetPath;
 	
 * FAQ:
  	* Why?
+ 		* Filesystem storage has the advantage of being large and cheap.  This comes at the tradeoff of speed.
  		* Mostly I want to learn how to make a GitHub repo and this is a project I've thought about for a long time.  I started programming in the late 90's at a company that didn't have a database and I spent many years managing large sets of data exclusivly through the filesystem.  It's a good cheap solution for "cold data" that doesn't need fast access or as a stand in for a real repository during development.
 	* How can I store extra files?
 		* The Workset class provides the path to the workset.  Go nuts.  Just leave the nameof(T).json file alone.
