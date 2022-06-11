@@ -9,7 +9,7 @@ Filesystem storage has the advantage of being large and cheap.  This comes at th
 
 # Example Code
 The unit tests are a great way to explore the capabilities of the library, but here are a few common tasks.
-## Create a repository
+## Instantiate a repository
 ### Directly make an IOptions object
 ```
 WorksetRepositoryOptions options = new() { BasePath = @"c:\Data" };
