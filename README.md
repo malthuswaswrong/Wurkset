@@ -1,9 +1,9 @@
 # Wurkset
-A simple, slow, file-based workset library with crude version control.
+A file-based repository that trades speed for size and simplicity.
 
 A workset is a unit of work.
 
-Wurkset lets you define a unit of work with a POCO.  You can easily create and save worksets to a filesystem.  You can enumerate over the full collection and filter with traditional Linq.
+Wurkset lets you define a unit of work with a POCO.  You can easily create and save worksets to a filesystem.  You can enumerate over the full collection and filter with traditional Linq.  It also contains a crude version control that lets you access snapshots of your data at a given time.
 
 # Example Code
 The unit tests are a great way to explore the capabilities of the library, but here are a few common tasks.
@@ -104,3 +104,5 @@ A simple WinForms application to "dog food" the repository.
 	* Should be able to tag a property in the class with an attribute that will mark it as an index.
 	* Then library will index on that attribute for faster searching
 	* This is hard, but worth it for long term.
+* [ ] Improve version control.
+	* Can be more efficient with diffs instead of full copy.
