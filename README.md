@@ -101,10 +101,10 @@ wsInstance.WorksetPath;
 	* What about race conditions?
 		* I *think* filesystems are atomic, at least when creating directories, so there *shouldn't* be any issues with parallelism, but I'm not an expert and could be wrong.  I hope to write tests to prove this in the future.  This is in the context of creating new Worksets.  Use regular caution when saving worksets.
 	* How performant is Wurkset?
-		* For create and retrieving by id it is "fine".  For searching it becoming noticably slow at "a few thousand" object.  I think search speed can be improved with the introduction of an index attribute that you could decorate your class with.  I hope to add this in future versions.
+		* For create and retrieving by id it is "fine".  For searching it becoming noticably slow at "a few thousand" objects.  I think search speed can be improved with the introduction of an index attribute that you could decorate your class with.  I hope to add this in future versions.
 * Be cautious about:
 	* Concurrency.  You have to wait for the hard drive.  Consider implementing as a singleton.
-	* Storing different classes in the same base directory.  Workset will enumerate faster if everything in the directory is the same class type.  It's simple to store each class in it's own directory.  Ex:
+	* Storing different classes in the same base directory.  Wurkset will enumerate faster if everything in the directory is the same class type.  It's simple to store each class in it's own directory.  Ex:
 		* C:\Data\ClassA
 		* C:\Data\ClassB
 	* Cluster size. Filesystems store files in clusters.  A 1 b file could still consume 1 kb on disk due to how the filesystem is configured.
