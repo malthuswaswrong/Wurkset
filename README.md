@@ -46,6 +46,10 @@ wsInstance.Save();
 Workset<TestDataA> wsInstance = wsr.GetById<TestDataA>(10);
 Debug.WriteLine(wsInstance.Value.Data);
 ```
+## Get your original object back without the Workset wrapper
+```
+TestDataA myTestData = wsr.GetById<TestDataA>(10).Value;
+```
 ## Get your object as it appeared last week
 ```
 Workset<TestDataA> wsCurrent = wsr.GetById(10);
