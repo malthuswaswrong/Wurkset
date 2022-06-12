@@ -109,7 +109,7 @@ wsInstance.WorksetPath;
 		* C:\Data\ClassB
 	* Cluster size. Filesystems store files in clusters.  A 1 b file could still consume 1 kb on disk due to how the filesystem is configured.
 # WeightTracker
-A simple WinForms application to "dog food" the repository.
+A simple WinForms application to demonstrate the repository.
 
 # TODO
 * [ ] Create automated build
