@@ -39,11 +39,12 @@ Workset<TestDataA> wsInstance = wsr.Create(new TestDataA() { Id = 1, Data = "Som
 ```
 wsInstance.Save();
 ```
-## Get a workset by id
+## Get a workset by id and access the original object with .Value
 ```
 Workset<TestDataA> wsInstance = wsr.GetById<TestDataA>(10);
+Debug.WriteLine(wsInstance.Value.Data);
 ```
-## Enumerate all worksets
+## Eumerate all worksets
 ```
 int chk = 1;
 foreach(Workset<TestDataA> wsInstance in wsr.GetAll<TestDataA>())
@@ -54,9 +55,9 @@ foreach(Workset<TestDataA> wsInstance in wsr.GetAll<TestDataA>())
     chk++;
 }
 ```
-## Search for a workset(s)
+## Search your object data and select the original object into a List\<T\> instead of the Workset wrapper object
 ```
-List<TestDataA> wsList = wsr.GetAll<TestDataA>()
+List<TestDataA> myDataOnlyList = wsr.GetAll<TestDataA>()
             .Where(x => x.Value?.Data.Contains("test"))
             .Select(x => x.Value)
             .ToList();
