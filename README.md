@@ -35,14 +35,25 @@ IHost host = Host.CreateDefaultBuilder()
 ```
 Workset<TestDataA> wsInstance = wsr.Create(new TestDataA() { Id = 1, Data = "Some test data" });
 ```
-## Save a workset
+## Create a workset, change some data, save the change
 ```
+Workset<TestDataA> wsInstance = wsr.Create(new TestDataA() { Id = 1, Data = "Version 1" });
+wsInstance.Value.Data = "Version 2";
 wsInstance.Save();
 ```
 ## Get a workset by id and access the original object with .Value
 ```
 Workset<TestDataA> wsInstance = wsr.GetById<TestDataA>(10);
 Debug.WriteLine(wsInstance.Value.Data);
+```
+## Get your object as it appeared last week
+```
+Workset<TestDataA> wsCurrent = wsr.GetById(10);
+Workset<TestDataA> wsLastWeek = wsCurrent.GetPriorVersionAsOfDate(DateTime.Now.AddDays(-7))
+```
+## Property containing list of all version times for the workset
+```
+wsInstance.PriorVersionDates;
 ```
 ## Eumerate all worksets
 ```
