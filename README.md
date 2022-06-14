@@ -9,20 +9,20 @@ Wurkset lets you define a unit of work with a POCO.  You can easily create and s
 The unit tests are a great way to explore the capabilities of the library, but here are a few common tasks.
 ## Instantiate a repository
 ### Directly make an IOptions object
-```
+```csharp
 WorksetRepositoryOptions options = new() { BasePath = @"c:\Data" };
 var ioptions = Options.Create(options);
 WorksetRepository wsr = new(ioptions);
 ```
 ### Initialize options with Action
-```
+```csharp
 WorksetRepository wsr = new WorksetRepository(options =>
         {
             options.BasePath = Path.Combine(Directory.GetCurrentDirectory(), "WeightData");
         });
 ```
 ### Add to dependency injection using provided Extension method
-```
+```csharp
 IHost host = Host.CreateDefaultBuilder()
         .ConfigureServices((context, services) =>
         {
@@ -32,35 +32,35 @@ IHost host = Host.CreateDefaultBuilder()
         }).Build();
 ```
 ## Create a workset
-```
+```csharp
 Workset<TestDataA> wsInstance = wsr.Create(new TestDataA() { Id = 1, Data = "Some test data" });
 ```
 ## Create a workset, change some data, save the change
-```
+```csharp
 Workset<TestDataA> wsInstance = wsr.Create(new TestDataA() { Id = 1, Data = "Version 1" });
 wsInstance.Value.Data = "Version 2";
 wsInstance.Save();
 ```
 ## Get a workset by id and access the original object with .Value
-```
+```csharp
 Workset<TestDataA> wsInstance = wsr.GetById<TestDataA>(10);
 Debug.WriteLine(wsInstance.Value.Data);
 ```
 ## Get your original object back without the Workset wrapper
-```
+```csharp
 TestDataA myTestData = wsr.GetById<TestDataA>(10).Value;
 ```
 ## Get your object as it appeared last week
-```
+```csharp
 Workset<TestDataA> wsCurrent = wsr.GetById(10);
 Workset<TestDataA> wsLastWeek = wsCurrent.GetPriorVersionAsOfDate(DateTime.Now.AddDays(-7))
 ```
 ## Property containing list of all version times for the workset
-```
+```csharp
 wsInstance.PriorVersionDates;
 ```
 ## Eumerate all worksets
-```
+```csharp
 int chk = 1;
 foreach(Workset<TestDataA> wsInstance in wsr.GetAll<TestDataA>())
 {
@@ -71,14 +71,14 @@ foreach(Workset<TestDataA> wsInstance in wsr.GetAll<TestDataA>())
 }
 ```
 ## Search your object data and select the original object into a List\<T\> instead of the Workset wrapper object
-```
+```csharp
 List<TestDataA> myDataOnlyList = wsr.GetAll<TestDataA>()
             .Where(x => x.Value?.Data.Contains("test"))
             .Select(x => x.Value)
             .ToList();
 ```
 ## Access the path of a workset
-```
+```csharp
 wsInstance.WorksetPath;
 ```
 # Additional Notes	
