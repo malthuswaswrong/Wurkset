@@ -49,7 +49,7 @@ public class WorksetRepository
     {
         WorksetRepositoryOptions options = new WorksetRepositoryOptions();
         configuration(options);
-        this.WorksetRepositoryOptions =  Options.Create(options);
+        this.WorksetRepositoryOptions = Options.Create(options);
     }
     private void FixNextWorksetId()
     {

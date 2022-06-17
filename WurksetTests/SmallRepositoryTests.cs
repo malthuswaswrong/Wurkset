@@ -56,7 +56,7 @@ public class SmallRepositoryTests
         {
             cut.Create(new TestDataA() { Id = i, Data = i.ToString() });
         }
-        
+
         Workset<TestDataA> verify = cut.GetById<TestDataA>(10);
         Assert.NotNull(verify);
         Assert.Equal(10, verify.Value?.Id);
@@ -71,7 +71,7 @@ public class SmallRepositoryTests
         }
 
         int chk = 1;
-        foreach(var t in cut.GetAll<TestDataA>())
+        foreach (var t in cut.GetAll<TestDataA>())
         {
             Assert.Equal(chk, t?.WorksetId);
             Assert.Equal(chk, t?.Value?.Id);
@@ -86,12 +86,12 @@ public class SmallRepositoryTests
         {
             cut.Create(new TestDataA() { Id = i, Data = i.ToString() });
         }
-        
+
         var t = cut.GetAll<TestDataA>()
             .Where(x => x.Value?.Id % 3 == 0)
             .Select(x => x.Value)
             .ToList();
-        
+
         Assert.Equal(3, t.Count());
     }
     [Fact]
@@ -123,13 +123,13 @@ public class SmallRepositoryTests
         Assert.NotNull(t1);
         Assert.NotNull(t1.Value);
         Assert.Equal("Version 2", t1.Value?.Data);
-        
+
         Workset<TestDataA> t2 = t1.GetPriorVersionAsOfDate(DateTime.Parse("1901-01-01"));
         Assert.NotNull(t2);
         Assert.Equal(t1.WorksetId, t2.WorksetId);
         Assert.Equal("Version 1", t2.Value?.Data);
     }
-    
+
     [Fact]
     public void TestSeachStartId()
     {

@@ -1,4 +1,3 @@
-using System;
 using Wurkset;
 
 namespace WeightTracker;
@@ -23,7 +22,7 @@ public partial class frmMain : Form
                     selectedWeightEntryWorkset = wsr.GetById<WeightEntry>(wsId);
                 }
             }
-            else if(selectedId is not null)
+            else if (selectedId is not null)
             {
                 selectedId = null;
                 selectedWeightEntryWorkset = null;
@@ -64,7 +63,7 @@ public partial class frmMain : Form
             );
             AddLVI(todayWS);
         }
-        
+
         lvWeightData.EnsureVisible(lvWeightData.Items.Count - 1);
         loading.Hide();
     }
@@ -170,7 +169,7 @@ public partial class frmMain : Form
                 BFPercent = SelectedWeightEntryWorkset.Value.BFPercent
             }
         );
-        
+
         int newidx = (direction < 0) ? lvWeightData.SelectedItems[0].Index : lvWeightData.SelectedItems[0].Index + 1;
         AddLVI(newWS, newidx);
     }
