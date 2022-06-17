@@ -1,34 +1,125 @@
 # Wurkset
-A simple, slow, file-based workset library with crude version control.
+A file-based repository that trades speed for size and simplicity.
 
 A workset is a unit of work.
 
-Wurkset lets you define a unit of work with a POCO.  You can easily create and save worksets to a filesystem.  You can enumerate over the full collection and filter with traditional Linq.
+Wurkset lets you define a unit of work with a POCO.  You can easily create and save worksets to a filesystem.  You can enumerate over the full collection and filter with traditional Linq.  It also contains a crude version control that lets you access snapshots of your data at a given time.
 
-Filesystem storage has the advantage of being large and cheap.  This comes at the tradeoff of speed.
-
-
-* Avoid:
-	* Concurrency with Wurkset.  You have to wait for the hard drive.  Instead inject as a singleton.
-	* Storing different classes in the same base directory.  Enumerating a repository with Wurkset will deserialize each class.  Instead store different classes in different base directores.
-	
-	
-* Be careful about:
-	* Cluster size. Filesystems store files in clusters.  A 1 b file could still consume 1 kb on disk due to how the filesystem is configured. Format the disk to match your use case... or don't.  Disk space is cheap.  That's the point.
-	
+# Example Code
+The unit tests are a great way to explore the capabilities of the library, but here are a few common tasks.
+## Instantiate a repository
+### Directly make an IOptions object
+```csharp
+WorksetRepositoryOptions options = new() { BasePath = @"c:\Data" };
+var ioptions = Options.Create(options);
+WorksetRepository wsr = new(ioptions);
+```
+### Initialize options with Action
+```csharp
+WorksetRepository wsr = new WorksetRepository(options =>
+        {
+            options.BasePath = Path.Combine(Directory.GetCurrentDirectory(), "WeightData");
+        });
+```
+### Add to dependency injection using provided Extension method
+```csharp
+IHost host = Host.CreateDefaultBuilder()
+        .ConfigureServices((context, services) =>
+        {
+            services.AddWurkset(options => {
+                options.BasePath = @"c:\Data";
+            });
+        }).Build();
+```
+## Create a workset
+```csharp
+Workset<TestDataA> wsInstance = wsr.Create(new TestDataA() { Id = 1, Data = "Some test data" });
+```
+## Create a workset, change some data, save the change
+```csharp
+Workset<TestDataA> wsInstance = wsr.Create(new TestDataA() { Id = 1, Data = "Version 1" });
+wsInstance.Value.Data = "Version 2";
+wsInstance.Save();
+```
+## Get a workset by id and access the original object with .Value
+```csharp
+Workset<TestDataA> wsInstance = wsr.GetById<TestDataA>(10);
+Debug.WriteLine(wsInstance.Value.Data);
+```
+## Get your original object back without the Workset wrapper
+```csharp
+TestDataA myTestData = wsr.GetById<TestDataA>(10).Value;
+```
+## Get your object as it appeared last week
+```csharp
+Workset<TestDataA> wsCurrent = wsr.GetById(10);
+Workset<TestDataA> wsLastWeek = wsCurrent.GetPriorVersionAsOfDate(DateTime.Now.AddDays(-7))
+```
+## Property containing list of all version times for the workset
+```csharp
+wsInstance.PriorVersionDates;
+```
+## Eumerate all worksets
+```csharp
+int chk = 1;
+foreach(Workset<TestDataA> wsInstance in wsr.GetAll<TestDataA>())
+{
+    Assert.Equal(chk, wsInstance.WorksetId);
+    Assert.Equal(chk, wsInstance.Value?.Id);
+    Assert.Equal(chk.ToString(), wsInstance.Value?.Data);
+    chk++;
+}
+```
+## Search your object data and select the original object into a List\<T\> instead of the Workset wrapper object
+```csharp
+List<TestDataA> myDataOnlyList = wsr.GetAll<TestDataA>()
+            .Where(x => x.Value?.Data.Contains("test"))
+            .Select(x => x.Value)
+            .ToList();
+```
+## Access the path of a workset
+```csharp
+wsInstance.WorksetPath;
+```
+# Additional Notes	
 * FAQ:
-	* How do I store extra files?
-		* The Workset class provides the path to the workset.  Go nuts.  Just leave the data.json file alone.
+ 	* Why?
+ 		* Filesystem storage has the advantage of being large and cheap.  This comes at the tradeoff of speed.
+ 		* Mostly I want to learn how to make a GitHub repo and this is a project I've thought about for a long time.  I started programming in the late 90's at a company that didn't have a database and I spent many years managing large sets of data exclusivly through the filesystem.  It's a good cheap solution for "cold data" that doesn't need fast access or as a stand in for a real repository during development.
+	* How can I store extra files?
+		* The Workset class provides the path to the workset.  Go nuts.  Just leave the nameof(T).json file alone.
+	* How does Wurkset store the files?
+		* Classes are stored on the filesystem in a nested subdirectory structure.  The identity is the combination of these subdirectories cast to a long
+		* Example:
+			* WorksetId 1: {BasePath}\1
+			* WorksetId 11: {BasePath}\1\1
+			* WorksetId 123456: {BasePath}\1\2\3\4\5\6
+		* This structure allows a large number of worksets to be created without creating a very long path, prevents any one directory from having a massive number of files, allows rapid direct access by id, and allows a straight forward binary search to find the "next id" by checking Directory.Exists.
+	* How do I get the identity of the workset that was just created?
+		* When you create or retrieve a workset it is wrapped in a generic class that contains WorksetId, WorksetPath, and various other properties.
+		* See unit tests or examples for more information
+	* What about race conditions?
+		* I *think* filesystems are atomic, at least when creating directories, so there *shouldn't* be any issues with parallelism, but I'm not an expert and could be wrong.  I hope to write tests to prove this in the future.  This is in the context of creating new Worksets.  Use regular caution when saving worksets.
+	* How performant is Wurkset?
+		* For create and retrieving by id it is "fine".  For searching it becoming noticably slow at "a few thousand" objects.  I think search speed can be improved with the introduction of an index attribute that you could decorate your class with.  I hope to add this in future versions.
+* Be cautious about:
+	* Concurrency.  You have to wait for the hard drive.  Consider implementing as a singleton.
+	* Storing different classes in the same base directory.  Wurkset will enumerate faster if everything in the directory is the same class type.  It's simple to store each class in it's own directory.  Ex:
+		* C:\Data\ClassA
+		* C:\Data\ClassB
+	* Cluster size. Filesystems store files in clusters.  A 1 b file could still consume 1 kb on disk due to how the filesystem is configured.
+# WeightTracker
+A simple WinForms application to demonstrate the repository.
 
 # TODO
-* Create IWorkset
-* Write demo app
-* Add Delete
-* Add "Rename"
-	* Rename class from A to B
-* Add Optional Index
-	* Should be able to tag a property in the class with an attribute that will	mark it as an index.
-	* Then app will index on that attribute for faster searching
-		* This is hard, but worth it for long term.
-* Look into ImageSharp for the FantasyTavern
-	* Quest PDF to geneate PDFs
+* [ ] Create automated build
+* [ ] Create NuGet
+* [ ] Create IWorkset interface
+* [ ] Add "Rename"
+	* Ex: Rename class from A to B
+* [ ] Add Optional Index
+	* Should be able to tag a property in the class with an attribute that will mark it as an index.
+	* Then library will index on that attribute for faster searching
+	* This is hard, but worth it for long term.
+* [ ] Improve version control.
+	* Can be more efficient with diffs instead of full copy.
