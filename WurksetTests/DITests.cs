@@ -2,8 +2,9 @@
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Wurkset;
 using System.IO;
+using Microsoft.Extensions.Configuration;
+using Wurkset;
 
 namespace WurksetTests;
 
@@ -12,7 +13,7 @@ public class DITests
     WorksetRepository? wurkset;
     private readonly string BaseDir = Path.Combine(Directory.GetCurrentDirectory(), "TestData", "DependencyInjection");
     public DITests()
-    {
+    {        
         IHost host = Host.CreateDefaultBuilder()
         .ConfigureServices((context, services) =>
         {

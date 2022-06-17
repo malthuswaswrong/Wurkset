@@ -164,4 +164,15 @@ public class SmallRepositoryTests
         Assert.Equal(10, cut.GetAll<TestDataA>().Count());
         Assert.Equal(10, cut.GetAll<TestDataB>().Count());
     }
+    [Fact]
+    public void TestDelete()
+    {
+        Workset<TestDataA> t1 = cut.Create(new TestDataA() { Id = 1, Data = "Version 1" });
+        Assert.NotNull(t1);
+        Assert.NotNull(t1.Value);
+        Assert.Equal("Version 1", t1.Value.Data);
+        Assert.Empty(t1.PriorVersionDates);
+        t1.Delete();
+        Assert.Empty(cut.GetAll<TestDataA>());
+    }
 }
