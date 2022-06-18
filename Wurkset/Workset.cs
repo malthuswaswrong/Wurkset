@@ -61,6 +61,11 @@ public class Workset<T>
     }
     public void Delete()
     {
-        if (File.Exists(WorksetDataFile)) File.Delete(WorksetDataFile);
+        var parent = Directory.GetParent(WorksetPath);
+        if(parent is null) throw new TooScaredException($"Parent null. Library too scared to delete.");
+        if (!Ulid.TryParse(parent.Name, out Ulid test)) throw new TooScaredException($"Parent name {parent.Name} does not parse into Ulid. Library too scared to delete.");
+        
+        parent.Delete(true);
+
     }
 }

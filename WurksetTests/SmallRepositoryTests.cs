@@ -69,8 +69,12 @@ public class SmallRepositoryTests
             cut.Create(new TestDataA() { Id = i, Data = i.ToString() });
         }
 
+        var orderedList = cut.GetAll<TestDataA>()
+            .ToList()
+            .OrderBy(x => x.Value.Id);
+        
         int chk = 1;
-        foreach (var t in cut.GetAll<TestDataA>())
+        foreach (var t in orderedList)
         {
             Assert.Equal(chk, t?.Value?.Id);
             Assert.Equal(chk.ToString(), t?.Value?.Data);
@@ -152,11 +156,23 @@ public class SmallRepositoryTests
     public void TestDelete()
     {
         Workset<TestDataA> t1 = cut.Create(new TestDataA() { Id = 1, Data = "Version 1" });
-        Assert.NotNull(t1);
-        Assert.NotNull(t1.Value);
-        Assert.Equal("Version 1", t1.Value.Data);
-        Assert.Empty(t1.PriorVersionDates);
+        Assert.NotEmpty(cut.GetAll<TestDataA>());
         t1.Delete();
+        Assert.Empty(cut.GetAll<TestDataA>());
+
+        t1 = cut.Create(new TestDataA() { Id = 1, Data = "Version 1" });
+        Assert.NotEmpty(cut.GetAll<TestDataA>());
+        cut.Delete(t1);
+        Assert.Empty(cut.GetAll<TestDataA>());
+
+        t1 = cut.Create(new TestDataA() { Id = 1, Data = "Version 1" });
+        Assert.NotEmpty(cut.GetAll<TestDataA>());
+        cut.Delete(t1.WorksetId);
+        Assert.Empty(cut.GetAll<TestDataA>());
+
+        t1 = cut.Create(new TestDataA() { Id = 1, Data = "Version 1" });
+        Assert.NotEmpty(cut.GetAll<TestDataA>());
+        cut.Delete(t1.WorksetId.ToString());
         Assert.Empty(cut.GetAll<TestDataA>());
     }
 }
