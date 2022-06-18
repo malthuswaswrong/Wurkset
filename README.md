@@ -112,6 +112,7 @@ A simple WinForms application to demonstrate the repository.
 * [ ] Add "Rename"
 	* Ex: Rename class from A to B
 * [ ] Add "Move"
+	* Ex: Move from "Active" repo to "Archive" repo
 * [ ] Add Optional Index
 	* Should be able to tag a property in the class with an attribute that will mark it as an index.
 	* Then library will index on that attribute for faster searching
