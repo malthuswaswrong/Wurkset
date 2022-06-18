@@ -68,4 +68,28 @@ public class WorksetRepository
             }
         }
     }
+    public void Delete<T>(Workset<T> target)
+    {
+        target.Delete();
+    }
+    public void Delete(Ulid worksetId)
+    {
+        string targetPath = pathBulder(worksetId);
+        if (!Directory.Exists(targetPath)) throw new TooScaredException($"Target {targetPath} does not exist. Library too scared to delete.");
+        var parent = Directory.GetParent(targetPath);
+        if(parent is null) throw new TooScaredException($"Parent is null. Library too scared to delete.");
+        
+        parent.Delete(true);
+    }
+    public void Delete(string worksetId)
+    {
+        if(Ulid.TryParse(worksetId, out Ulid target))
+        {
+            Delete(target);
+        }
+        else
+        {
+            throw new TooScaredException($"worksetId is not valid. Library too scared to delete.");
+        }
+    }
 }
