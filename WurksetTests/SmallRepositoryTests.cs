@@ -36,7 +36,6 @@ public class SmallRepositoryTests
     [Fact]
     public void CreateRepository()
     {
-        Assert.Equal(1, cut.NextWorksetId);
         Assert.True(Directory.Exists(basePath));
     }
     [Fact]
@@ -45,22 +44,22 @@ public class SmallRepositoryTests
         for (int i = 0; i < 10; i++)
         {
             var t = cut.Create(new TestDataA() { Id = i, Data = i.ToString() });
-            Assert.Equal(i + 1, t.WorksetId);
         }
-        Assert.Equal(11, cut.NextWorksetId);
+        Assert.Equal(10, cut.GetAll<TestDataA>().ToList().Count);
     }
     [Fact]
     public void RetrieveWorkset()
     {
+        Workset<TestDataA> first = cut.Create(new TestDataA() { Id = 0, Data = "First" });
         for (int i = 1; i <= 10; i++)
         {
             cut.Create(new TestDataA() { Id = i, Data = i.ToString() });
         }
 
-        Workset<TestDataA> verify = cut.GetById<TestDataA>(10);
+        Workset<TestDataA> verify = cut.GetById<TestDataA>(first.WorksetId);
         Assert.NotNull(verify);
-        Assert.Equal(10, verify.Value?.Id);
-        Assert.Equal("10", verify.Value?.Data);
+        Assert.Equal(0, verify.Value?.Id);
+        Assert.Equal("First", verify.Value?.Data);
     }
     [Fact]
     public void RetrieveAllWorksets()
@@ -73,7 +72,6 @@ public class SmallRepositoryTests
         int chk = 1;
         foreach (var t in cut.GetAll<TestDataA>())
         {
-            Assert.Equal(chk, t?.WorksetId);
             Assert.Equal(chk, t?.Value?.Id);
             Assert.Equal(chk.ToString(), t?.Value?.Data);
             chk++;
@@ -99,12 +97,11 @@ public class SmallRepositoryTests
     {
         Workset<TestDataA> t1 = cut.Create(new TestDataA() { Id = 1, Data = "1" });
         Assert.NotNull(t1);
-        Assert.Equal(1, t1.WorksetId);
         Assert.NotNull(t1.Value);
         Assert.Equal("1", t1.Value.Data);
         t1.Value.Data = t1.Value?.Data + " a change";
         t1.Save();
-        Workset<TestDataA> t2 = cut.GetById<TestDataA>(1);
+        Workset<TestDataA> t2 = cut.GetById<TestDataA>(t1.WorksetId);
         Assert.NotNull(t2);
         Assert.NotNull(t2.Value);
         Assert.Equal("1 a change", t2.Value?.Data);
@@ -130,19 +127,6 @@ public class SmallRepositoryTests
         Assert.Equal("Version 1", t2.Value?.Data);
     }
 
-    [Fact]
-    public void TestSeachStartId()
-    {
-        for (int i = 0; i < 100; i++)
-        {
-            cut.Create(new TestDataA() { Id = i, Data = i.ToString() });
-        }
-        Assert.Equal(100, cut.GetAll<TestDataA>().Count());
-        Assert.Equal(100, cut.GetAll<TestDataA>(new GetAllOptions { StartId = 1 }).Count());
-        Assert.Equal(50, cut.GetAll<TestDataA>(new GetAllOptions { StartId = 51 }).Count());
-        Assert.Single(cut.GetAll<TestDataA>(new GetAllOptions { StartId = 100 }));
-        Assert.Empty(cut.GetAll<TestDataA>(new GetAllOptions { StartId = 101 }));
-    }
     [Fact]
     public void TestTimes()
     {

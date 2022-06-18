@@ -1,3 +1,4 @@
+using NUlid;
 using Wurkset;
 
 namespace WeightTracker;
@@ -7,7 +8,7 @@ public partial class frmMain : Form
     WorksetRepository wsr;
     double bftarget = 15f;
     double caloriesIn1Lbs = 3500f;
-    long? selectedId = null;
+    Ulid? selectedId = null;
     Workset<WeightEntry>? selectedWeightEntryWorkset = null;
     public Workset<WeightEntry>? SelectedWeightEntryWorkset
     {
@@ -15,7 +16,7 @@ public partial class frmMain : Form
         {
             if (lvWeightData.SelectedItems.Count > 0)
             {
-                long wsId = (long)lvWeightData.SelectedItems[0].Tag;
+                Ulid wsId = (Ulid)lvWeightData.SelectedItems[0].Tag;
                 if (selectedId != wsId)
                 {
                     selectedId = wsId;

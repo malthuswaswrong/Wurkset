@@ -1,25 +1,12 @@
 ﻿using Microsoft.Extensions.Options;
+using NUlid;
 using System.Text.Json;
 
 namespace Wurkset;
 
 public class WorksetRepository
 {
-    private long lastWorksetId;
-    public long NextWorksetId
-    {
-        get
-        {
-            long result = lastWorksetId;
-            while (Directory.Exists(Path.Combine(WorksetRepositoryOptions.Value.BasePath, result.ToPath())))
-            {
-                result++;
-            }
-            lastWorksetId = result - 1;
-            return result;
-        }
-    }
-    private string pathBulder(long id) => Path.Combine(WorksetRepositoryOptions.Value.BasePath, id.ToPath(), "ws");
+    private string pathBulder(Ulid worksetId) => Path.Combine(WorksetRepositoryOptions.Value.BasePath, worksetId.ToString(), "ws");
     public readonly IOptions<WorksetRepositoryOptions> WorksetRepositoryOptions;
 
     public WorksetRepository(IOptions<WorksetRepositoryOptions> options)
@@ -38,12 +25,6 @@ public class WorksetRepository
         {
             Directory.CreateDirectory(this.WorksetRepositoryOptions.Value.BasePath);
         }
-        if (!Directory.Exists(Path.Combine(this.WorksetRepositoryOptions.Value.BasePath, "0")))
-        {
-            //Reserve directory "0" for internal use.
-            Directory.CreateDirectory(Path.Combine(this.WorksetRepositoryOptions.Value.BasePath, "0"));
-        }
-        FixNextWorksetId();
     }
     public WorksetRepository(Action<WorksetRepositoryOptions> configuration)
     {
@@ -51,73 +32,32 @@ public class WorksetRepository
         configuration(options);
         this.WorksetRepositoryOptions = Options.Create(options);
     }
-    private void FixNextWorksetId()
-    {
-        if (!Directory.Exists(Path.Combine(WorksetRepositoryOptions.Value.BasePath, "1")))
-        {
-            lastWorksetId = 0;
-        }
-
-        long maxSearch = 2;
-        while (Directory.Exists(Path.Combine(WorksetRepositoryOptions.Value.BasePath, maxSearch.ToPath())))
-        {
-            maxSearch *= 2;
-        }
-        long minSearch = maxSearch / 2;
-        lastWorksetId = BinarySearch(minSearch, maxSearch);
-    }
-
-    private long BinarySearch(long min, long max)
-    {
-        if (max - min <= 1)
-        {
-            return min;
-        }
-        long mid = (min + max) / 2;
-        if (Directory.Exists(Path.Combine(WorksetRepositoryOptions.Value.BasePath, mid.ToPath())))
-        {
-            return BinarySearch(mid, max);
-        }
-        else
-        {
-            return BinarySearch(min, mid);
-        }
-    }
 
     public Workset<T> Create<T>(T data)
     {
-        long newId = NextWorksetId;
+        Ulid newId = Ulid.NewUlid();
         string path = pathBulder(newId);
         Directory.CreateDirectory(path);
         string datafile = Path.Combine(path, $"{typeof(T).Name}.json");
         File.WriteAllText(datafile, JsonSerializer.Serialize(data));
         return new Workset<T>(newId, path, data);
     }
-    public Workset<T> GetById<T>(long id)
+    public Workset<T> GetById<T>(Ulid worksetId)
     {
-        string path = pathBulder(id);
+        string path = pathBulder(worksetId);
         string datafile = Path.Combine(path, $"{typeof(T).Name}.json");
         if (!File.Exists(datafile))
         {
-            throw new FileNotFoundException($"Workset of type {nameof(T)} with id {id} not found");
+            throw new FileNotFoundException($"Workset of type {nameof(T)} with id {worksetId} not found");
         }
         T data = JsonSerializer.Deserialize<T>(File.ReadAllText(datafile)) ?? throw new Exception("Data is null");
-        return new Workset<T>(id, path, data);
+        return new Workset<T>(worksetId, path, data);
     }
-    public IEnumerable<Workset<T>> GetAll<T>(GetAllOptions? getOptions = null)
+    public IEnumerable<Workset<T>> GetAll<T>()
     {
-        long id = getOptions != null && getOptions.StartId.HasValue ? getOptions.StartId.Value : 1;
-        int step = 1;
-        if (getOptions != null && getOptions.Descending.HasValue && getOptions.Descending.Value)
+        foreach(var wsDir in Directory.GetDirectories(WorksetRepositoryOptions.Value.BasePath))
         {
-            step = -1;
-            if (!getOptions.StartId.HasValue)
-            {
-                id = NextWorksetId - 1;
-            }
-        }
-        for (; id < NextWorksetId; id += step)
-        {
+            Ulid id = Ulid.Parse(Path.GetFileName(wsDir));
             string path = pathBulder(id);
             string datafile = Path.Combine(path, $"{typeof(T).Name}.json");
 
