@@ -1,10 +1,11 @@
-﻿using System.Text.Json;
+﻿using NUlid;
+using System.Text.Json;
 
 namespace Wurkset;
 
 public class Workset<T>
 {
-    public long WorksetId { get; }
+    public Ulid WorksetId { get; }
     public string WorksetPath { get; }
     public string WorksetDataFile => Path.Combine(WorksetPath, $"{typeof(T).Name}.json");
     public T Value { get; set; }
@@ -31,7 +32,7 @@ public class Workset<T>
             return result;
         }
     }
-    public Workset(long worksetId, string worksetPath, T value)
+    public Workset(Ulid worksetId, string worksetPath, T value)
     {
         WorksetId = worksetId;
         WorksetPath = worksetPath;
