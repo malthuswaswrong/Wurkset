@@ -4,6 +4,16 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <FileVersion>0.2</FileVersion>
+    <AssemblyVersion>0.2</AssemblyVersion>
+    <Title>Wurkset</Title>
+    <Description>A simple slow file system based object repository</Description>
+    <PackageProjectUrl>https://github.com/malthuswaswrong/Wurkset</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/malthuswaswrong/Wurkset</RepositoryUrl>
+    <PackageTags>worket;repository;file;filesystem;directory</PackageTags>
+    <PackageReleaseNotes>Initial release</PackageReleaseNotes>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Authors>$(AssemblyName)</Authors>
   </PropertyGroup>
 
   <ItemGroup>
