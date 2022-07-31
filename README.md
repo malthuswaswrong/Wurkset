@@ -43,16 +43,16 @@ wsInstance.Save();
 ```
 ## Get a workset by id and access the original object with .Value
 ```csharp
-Workset<TestDataA> wsInstance = wsr.GetById<TestDataA>(10);
+Workset<TestDataA> wsInstance = wsr.GetById<TestDataA>(worksetId);
 Debug.WriteLine(wsInstance.Value.Data);
 ```
 ## Get your original object back without the Workset wrapper
 ```csharp
-TestDataA myTestData = wsr.GetById<TestDataA>(10).Value;
+TestDataA myTestData = wsr.GetById<TestDataA>(worksetId).Value;
 ```
 ## Get your object as it appeared last week
 ```csharp
-Workset<TestDataA> wsCurrent = wsr.GetById(10);
+Workset<TestDataA> wsCurrent = wsr.GetById(worksetId);
 Workset<TestDataA> wsLastWeek = wsCurrent.GetPriorVersionAsOfDate(DateTime.Now.AddDays(-7))
 ```
 ## Property containing list of all version times for the workset
@@ -87,21 +87,15 @@ wsInstance.WorksetPath;
  		* Filesystem storage has the advantage of being large and cheap.  This comes at the tradeoff of speed.
  		* Mostly I want to learn how to make a GitHub repo and this is a project I've thought about for a long time.  I started programming in the late 90's at a company that didn't have a database and I spent many years managing large sets of data exclusivly through the filesystem.  It's a good cheap solution for "cold data" that doesn't need fast access or as a stand in for a real repository during development.
 	* How can I store extra files?
-		* The Workset class provides the path to the workset.  Go nuts.  Just leave the nameof(T).json file alone.
+		* The Workset class provides the path to the workset data directory.  Feel free to get the parent of that directory and go nuts.  Recommend leaving the "ws" sub directory alone.
 	* How does Wurkset store the files?
-		* Classes are stored on the filesystem in a nested subdirectory structure.  The identity is the combination of these subdirectories cast to a long
-		* Example:
-			* WorksetId 1: {BasePath}\1
-			* WorksetId 11: {BasePath}\1\1
-			* WorksetId 123456: {BasePath}\1\2\3\4\5\6
-		* This structure allows a large number of worksets to be created without creating a very long path, prevents any one directory from having a massive number of files, allows rapid direct access by id, and allows a straight forward binary search to find the "next id" by checking Directory.Exists.
+		* Classes are stored on the filesystem in a nested directory structure using the worksetId as the parent directory and a "ws" subdirectory to contain the serialized json.  The workset id is a unique guid like structure generated with a library named NUlid (avalable on github and nuget).
 	* How do I get the identity of the workset that was just created?
 		* When you create or retrieve a workset it is wrapped in a generic class that contains WorksetId, WorksetPath, and various other properties.
 		* See unit tests or examples for more information
-	* What about race conditions?
-		* I *think* filesystems are atomic, at least when creating directories, so there *shouldn't* be any issues with parallelism, but I'm not an expert and could be wrong.  I hope to write tests to prove this in the future.  This is in the context of creating new Worksets.  Use regular caution when saving worksets.
 	* How performant is Wurkset?
-		* For create and retrieving by id it is "fine".  For searching it becoming noticably slow at "a few thousand" objects.  I think search speed can be improved with the introduction of an index attribute that you could decorate your class with.  I hope to add this in future versions.
+		* For create and retrieving by id it is "fine".  For searching it becoming noticably slow at "a few thousand" objects.
+		* You can manage performance by making additional repositories.  You can even make a repository under a repository so you can group similar ideas together.  Increase "depth" to decrease "width".
 * Be cautious about:
 	* Concurrency.  You have to wait for the hard drive.  Consider implementing as a singleton.
 	* Storing different classes in the same base directory.  Wurkset will enumerate faster if everything in the directory is the same class type.  It's simple to store each class in it's own directory.  Ex:
@@ -117,6 +111,8 @@ A simple WinForms application to demonstrate the repository.
 * [ ] Create IWorkset interface
 * [ ] Add "Rename"
 	* Ex: Rename class from A to B
+* [ ] Add "Move"
+	* Ex: Move from "Active" repo to "Archive" repo
 * [ ] Add Optional Index
 	* Should be able to tag a property in the class with an attribute that will mark it as an index.
 	* Then library will index on that attribute for faster searching
